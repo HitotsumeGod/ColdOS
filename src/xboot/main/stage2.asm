@@ -1,13 +1,16 @@
 bits 16
+org 0x1000
 
 kern_start	equ 0x1400
-stack_bottom	equ 0x09000
+stack_bottom	equ 0x090000
 CODE		equ 0x08
+DATA		equ 0x10
 
 ; 
 ; XBOOT data section (aligned to both hard disk sector boundaries).
 ; Remember to jump over this to the next sector when loading with XBOOT Stage 1.
 ;
+
 gdt:
 	gdt_null:
 		dd 0
@@ -51,6 +54,11 @@ prep_prot:
 	jmp	CODE:prot_mode
 prot_mode:
 bits 32
+	mov	ax, CODE
+	mov	ds, ax
+	mov	ax, DATA
+	mov	ss, ax
+	mov	esp, stack_bottom
 	; pass control to the kernel
-	jmp	kern_start
+	jmp	CODE:kern_start
 times 512 - ($ - endata) db 0
