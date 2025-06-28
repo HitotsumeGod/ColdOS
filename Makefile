@@ -28,5 +28,4 @@ clean:
 	rm -f *.o
 	rm -f *.s
 	rm -f *.asm
-	rm -f *.bin
 	rm -f vgcore.*

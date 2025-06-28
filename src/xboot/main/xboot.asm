@@ -3,6 +3,8 @@
 bits 16
 org 0x7C00
 
+CODE	equ 0x08
+
 print_start:
 	; print welcome message using UEFI/BIOS
 	mov	ah, 0x0E
@@ -52,9 +54,23 @@ load_kern:
 	xor	bx, bx
 	int	0x13
 	jc	load_kern
-	; hand control to the kernel
 	call	print_boot
-	jmp	0x1000:0x0000
+prep_prot:
+	cli
+	xor	ax, ax
+	mov	ds, ax
+	lgdt	[gdt_desc]
+	mov	eax, cr0
+	or	eax, 1
+	mov	cr0, eax
+	jmp	CODE:prot_mode
+prot_mode:
+bits 32
+	mov	ah, 0x0E
+	mov	al, 65
+	int	0x10
+	; hand control to the kernel
+	jmp	CODE:0x1000
 print_boot:
 	mov	ah, 0x0E
 	mov	al, 0x20
@@ -91,5 +107,27 @@ print_boot:
 	int	0x10
 	int	0x10
 	ret
+gdt:
+	gdt_null:
+		dd 0
+		dd 0
+	gdt_code:
+		dw 0xFFFF
+		dw 0
+		db 0
+		db 10011010b
+		db 11001111b
+		db 0
+	gdt_data:
+		dw 0xFFFF
+		dw 0
+		db 0
+		db 10010010b
+		db 11001111b
+		db 0
+gdt_end
+gdt_desc:
+	dw gdt_end - gdt - 1
+	dd gdt
 times 510-($-$$) db 0
 db 0x55, 0xAA
