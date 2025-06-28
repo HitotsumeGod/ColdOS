@@ -27,4 +27,5 @@ https://www.reddit.com/r/osdev/comments/nz0old/getting_from_bootloader_to_kernel
 http://www.osdever.net/tutorials/view/the-world-of-protected-mode
 
 https://chatgpt.com ;)
+
 DO NOT FORGET TO ORG XXX AT THE START OF YOUR PROTECTION MODE MOVER, ELSE YOU MAY GET A TRIPLE FAULT
