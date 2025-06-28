@@ -12,3 +12,4 @@ http://www.osdever.net/tutorials/view/loading-sectors
 https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3a-part-1-manual.pdf
 https://www.reddit.com/r/osdev/comments/nz0old/getting_from_bootloader_to_kernel/
 https://chatgpt.com ;)
+DO NOT FORGET TO ORG XXX AT THE START OF YOUR PROTECTION MODE MOVER, ELSE YOU MAY GET A TRIPLE FAULT
