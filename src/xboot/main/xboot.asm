@@ -3,6 +3,27 @@
 bits 16
 org 0x7C00
 
+gdt:
+	gdt_null:
+		dq 0
+	gdt_code:
+		dw 0xFFFF
+		dw 0
+		db 0
+		db 10011010b
+		db 11001111b
+		db 0
+	gdt_data:
+		dw 0xFFFF
+		dw 0
+		db 0
+		db 10010010b
+		db 11001111b
+		db 0
+gdt_end
+gdt_desc:
+	db gdt_end - gdt
+	dw gdt
 print_start:
 	; print welcome message using UEFI/BIOS
 	mov	ah, 0x0E
@@ -52,8 +73,21 @@ load_kern:
 	xor	bx, bx
 	int	0x13
 	jc	load_kern
-	; hand control to the kernel
 	call	print_boot
+	; switch to 32-bit protected mode
+	cli
+	lgdt	[gdt_desc]
+	mov	eax, cr0
+	or	eax, 1
+	mov	cr0, eax
+	jmp	0x08:boot_kern
+boot_kern:
+bits 32
+	mov	ax, 0x08
+	mov	ds, ax
+	mov	ss, ax
+	mov	esp, 0x090000
+	; hand control to the kernel
 	jmp	0x1000:0x0000
 print_boot:
 	mov	ah, 0x0E
