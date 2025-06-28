@@ -1,6 +1,6 @@
 bits 32
 
-gogogo:
+gogogo:	
 	cli
 	hlt
 	jmp	gogogo
