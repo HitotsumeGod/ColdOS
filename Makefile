@@ -1,5 +1,6 @@
 CC=gcc
 AS=nasm
+OBJ=objcopy
 X=xxd
 VM=qemu-system-x86_64
 XSRC=src/xboot/main
@@ -15,14 +16,16 @@ $(BUILD)/xboot.bin: $(XSRC)/stage1.asm $(XSRC)/stage2.asm $(BUILD)
 	$(AS) -f bin -o $(BUILD)/stage1.bin $(XSRC)/stage1.asm -i $(XDEPS) $(OPTS)
 	$(AS) -f bin -o $(BUILD)/stage2.bin $(XSRC)/stage2.asm -i $(XDEPS) $(OPTS)
 	cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin > $@
-$(BUILD)/kernel.bin: $(KSRC)/kernel.asm $(BUILD)
-	$(AS) -f bin -o $@ $< -i $(KDEPS) $(OPTS)
+$(BUILD)/kernel.bin: $(BUILD)/kernel.o
+	$(OBJ) -O binary -j .text $< $@
+$(BUILD)/kernel.o: $(KSRC)/kernel.c $(BUILD)
+	$(CC) -c -o $@ $< -nostdlib -O0 -masm=intel -fno-asynchronous-unwind-tables -fomit-frame-pointer -I $(KDEPS)
 $(BUILD):
 	if ! [ -d $@ ]; then			\
 		mkdir $@;			\
 	fi
 run: $(BUILD)/coldOS.bin
-	$(VM) -drive format=raw,file=$< -d int,cpu_reset -no-reboot
+	$(VM) -drive format=raw,file=$<
 dump: $(BUILD)/coldOS.bin
 	$(X) $<
 bdump: $(BUILD)/coldOS.bin
